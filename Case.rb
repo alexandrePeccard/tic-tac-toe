@@ -1,11 +1,14 @@
+# Class which represents a Case on the game board.
+# Contains a couple of coordinate to find the case on the board,
+# and some methods to know which player owns it.
 class Case
 	private
-		attr_accessor :x, :y, :content
+		attr_accessor :x, :y, :owner
 
-		def initialize(x, y, content = '-')
+		def initialize(x, y, owner)
 			@x = x
 			@y = y
-			@content = content
+			@owner = owner
 		end
 
 	public
@@ -17,21 +20,21 @@ class Case
 		def get_y
 			return @y
 		end
-		
-		def get_content
-			return @content
+
+		def get_owner
+			return @owner
 		end
 
-		def set_content(content)
-			@content = content
+		def set_owner(owner)
+			@owner = owner
 		end
 
 		def to_string
 			result = ""
-			if @content.class == string
+			if @owner == nil
 				result = "-"
-			elsif @content.class == Player
-				result = @content.symbol
+			else 
+				result = @owner.get_symbol
 			end
 
 			return result

@@ -2,15 +2,28 @@ require './Player'
 require './Case'
 require './Board.rb'
 
+# Main class. Its contains a link to all another classes.
+# Allow to run the game, manage victory conditions, menu etc..
 class Game
 	private
 		attr_accessor :scoreboard, :players, :board, :is_over, :victory_positions, :turn_count
 
+		def create_players
+			puts "Choose the name of the player 1 !"
+			player_one_name = gets.chomp
+
+			puts "Choose the name of the player 2 !"
+			player_two_name = gets.chomp
+
+			@players << Player.new(player_one_name, 0, "x")
+			@players << Player.new(player_two_name, 0, "o")
+		end
+
 		def initialize()
 			@turn_count = 0
 			@players = []
-			@players << Player.new("alex", 0, "x")
-			@players << Player.new("michel", 0, "o")
+
+			create_players
 
 			@scoreboard = {}
 			@players.each do | player |
@@ -21,7 +34,6 @@ class Game
 			@board.build_map
 			@is_over = false
 
-			@victory_positions = []
 			@victory_positions = [
 				[
 					#horizontal haut
@@ -40,7 +52,7 @@ class Game
 					[0, 0], [1, 1], [2, 2]
 				],
 				[
-					#oblique droite vers gauche 
+					#oblique droite vers gauche
 					[0, 2], [1, 1], [2, 0]
 				],
 				[
@@ -59,27 +71,6 @@ class Game
 		end
 
 	public
-
-		def check_if_player_win
-			result = false
-			map = get_board.get_map
-			@victory_positions.each do | a, b, c |
-				# puts "la case #{map[a].get_x}, #{map[a].get_y} contient #{map[a].get_content}"
-					# return false 
-				if @turn_count > 0
-					if (map[a].get_content != "-" || map[b].get_content != "-" || map[c].get_content != "-")
-						# puts (map[a].get_content == map[b].get_content && map[a].get_content == map[c].get_content && map[b].get_content ==  map[c].get_content)
-						if (map[a].get_content == map[b].get_content && map[a].get_content == map[c].get_content && map[b].get_content ==  map[c].get_content)
-							puts "Victory"
-							result= true
-						end
-					end
-				end
-			end
-
-			return result
-		end
-
 		def set_turn_count
 			@turn_count +=1
 		end
@@ -106,5 +97,54 @@ class Game
 
 		def set_is_over(is_over)
 			@is_over = is_over
+		end
+
+		def check_if_player_win(player)
+			@board.print_map
+			puts "\n"
+			map = get_board.get_map
+
+			@victory_positions.each do | a, b, c |
+
+				if @turn_count > 0
+					if (map[a].get_owner != nil || map[b].get_owner != nil || map[c].get_owner != nil)
+						if (map[a].get_owner == map[b].get_owner && map[a].get_owner == map[c].get_owner && map[b].get_owner ==  map[c].get_owner)
+							puts "Le joueur #{player.get_name} a gagné la partie !"
+							puts "Victory"
+							player.increment_score
+							set_is_over(true)
+						end
+					end
+				end
+			end
+		end
+
+		def run
+			while get_is_over != true
+				# board = get_board
+					
+				get_players.each do | player |
+					unless get_is_over then
+						system "clear" or system "cls"
+						get_board.print_map
+						puts "\n"
+						puts "C\'est au joueur #{player.get_name} de jouer !\n"
+
+						is_move_valid = false
+
+						# appel fonction play de l'objet joueur qui renvoie la case à laquelle il a joué
+						# on boucle pour que le joueur rejoue si son coup n'est pas valide
+						while is_move_valid != true
+							last_move_params = player.play
+							@board, is_move_valid = get_board.update(last_move_params)
+						end
+						puts "\n"
+
+						# on vérifie si le joueur remplie les conditions de victoire 
+						check_if_player_win(player)
+						set_turn_count
+					end
+				end
+			end
 		end
 end

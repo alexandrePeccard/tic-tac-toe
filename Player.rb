@@ -1,3 +1,6 @@
+# Class which represents a Player.
+# Allow to select an area on the board to play
+# and memorize the score.
 class Player
 	private
 		attr_accessor :name, :score, :symbol
@@ -11,14 +14,12 @@ class Player
 	public
 		def play
 			position = []
-			# puts "Select the case you want to play."
 			puts "Choose a column"
 			line_number = Integer(gets.chomp)
 			puts "Choose a line"
 			column_number = Integer(gets.chomp)
-			# puts "Ok you play #{column_number}#{line_number}"
 
-			return Case.new(column_number, line_number, get_symbol)
+			return [self, [column_number, line_number]]
 		end
 
 		def get_name
@@ -31,5 +32,9 @@ class Player
 		
 		def get_symbol
 			return @symbol
+		end
+
+		def increment_score
+			@score += 1
 		end
 end
