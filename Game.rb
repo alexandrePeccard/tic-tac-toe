@@ -121,28 +121,41 @@ class Game
 
 		def run
 			while get_is_over != true
-				# board = get_board
-					
+
 				get_players.each do | player |
 					unless get_is_over then
 						system "clear" or system "cls"
 						get_board.print_map
-						puts "\n"
-						puts "C\'est au joueur #{player.get_name} de jouer !\n"
 
-						is_move_valid = false
-
-						# appel fonction play de l'objet joueur qui renvoie la case à laquelle il a joué
-						# on boucle pour que le joueur rejoue si son coup n'est pas valide
-						while is_move_valid != true
-							last_move_params = player.play
-							@board, is_move_valid = get_board.update(last_move_params)
+						# This piece of code allows to check if there is available case to play. 
+						still_available_cases = false
+						get_board.get_cases.each do | current_case |
+							still_available_cases = true if current_case.get_owner == nil
 						end
-						puts "\n"
 
-						# on vérifie si le joueur remplie les conditions de victoire 
-						check_if_player_win(player)
-						set_turn_count
+						if still_available_cases
+							puts "\n"
+							puts "C\'est au joueur #{player.get_name} de jouer !\n"
+
+
+							is_move_valid = false
+
+							# appel fonction play de l'objet joueur qui renvoie la case à laquelle il a joué
+							# on boucle pour que le joueur rejoue si son coup n'est pas valide
+							while is_move_valid != true
+								last_move_params = player.play
+								@board, is_move_valid = get_board.update(last_move_params)
+							end
+							puts "\n"
+
+							# on vérifie si le joueur remplie les conditions de victoire 
+							check_if_player_win(player)
+							set_turn_count
+							else
+							puts "None players have won and there are no more available case to play."
+							puts "It is an equality ! Game is over !"
+							set_is_over(true)
+						end
 					end
 				end
 			end
